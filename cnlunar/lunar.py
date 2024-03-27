@@ -30,7 +30,9 @@ class Lunar:
 
         self.todaySolarTerms = self.get_todaySolarTerms()
         # 立春干支参数
-        self._x = 1 if self.year8Char == 'beginningOfSpring' and self.nextSolarTermYear == self.lunarYear and self.nextSolarNum < 3 else 0
+
+        self._x = self.getBeginningOfSpringX()
+        # print('x=', int(self._x))
 
         (self.year8Char, self.month8Char, self.day8Char) = self.get_the8char()
         self.get_earthNum(), self.get_heavenNum(), self.get_season()
@@ -49,6 +51,38 @@ class Lunar:
         self.content = ''
         self.angelDemon = self.get_AngelDemon()
         self.meridians = meridiansName[self.twohourNum % 12]
+
+    def getBeginningOfSpringX(self):
+        # print(self.nextSolarTermYear, self.lunarYear, self.nextSolarNum, self.lunarYear - self.nextSolarTermYear)
+        isBeforBeginningOfSpring = self.nextSolarNum < 3
+        # print('是否在立春前', isBeforBeginningOfSpring, self.nextSolarNum)
+        # print('spanDays', self.spanDays)
+        isBeforLunarYear = self.spanDays < 0
+        # print('是过农历年', isBeforLunarYear)
+        _x = 0
+        if self.year8Char != 'beginningOfSpring':
+            return _x
+        # 现在节气在立春之前 且 已过完农历年(农历小于3月作为测试判断)，年柱需要减1
+        if isBeforLunarYear:
+            # print('还没过农历年')
+            if not isBeforBeginningOfSpring:
+            #     print('立春前')
+            #     _x = 0
+            # else:
+            #     print('立春后')
+                _x = -1
+        else:
+            # print('过农历年了')
+            if isBeforBeginningOfSpring:
+                # print('立春前')
+                _x = 1
+        #     else:
+        #         print('立春后')
+        #         _x = 0
+        # print(_x)
+        return _x
+
+
 
     def get_lunarYearCN(self):
         for i in str(self.lunarYear):
@@ -147,8 +181,10 @@ class Lunar:
         """
         self.lunarYear, self.lunarMonth, self.lunarDay = self.date.year, 1, 1
         _code_year = lunarNewYearList[self.lunarYear - START_YEAR]
+
         """ 获取当前日期与当年春节的差日 """
         _span_days = (self.date - datetime(self.lunarYear, ((_code_year >> 5) & 0x3), ((_code_year >> 0) & 0x1f))).days
+        self.spanDays = _span_days
         if (_span_days >= 0):
             """ 新年后推算日期，差日依序减月份天数，直到不足一个月，剪的次数为月数，剩余部分为日数 """
             """ 先获取闰月 """
@@ -701,7 +737,7 @@ class Lunar:
              ['祭祀', '祈福', '求嗣', '上册', '上表章', '颁诏', '覃恩', '施恩', '招贤', '举正直', '恤孤茕', '宣政事', '雪冤', '庆赐', '宴会', '出行',
               '安抚边境', '选将', '上官', '临政', '结婚姻', '纳采', '嫁娶', '搬移', '解除', '求医疗病', '裁制', '营建', '缮城郭', '修造', '竖柱上梁', '修仓库',
               '栽种', '牧养', '纳畜', '安葬'], ['畋猎', '取鱼']),
-            ('天愿', '甲子癸未甲午甲戌乙酉丙子丁丑戊午甲寅丙辰辛卯戊辰'[men], d,
+            ('天愿', ['甲子', '癸未', '甲午', '甲戌', '乙酉', '丙子', '丁丑', '戊午', '甲寅', '丙辰', '辛卯', '戊辰'][men], d,
              ['祭祀', '祈福', '求嗣', '上册', '上表章', '颁诏', '覃恩', '施恩', '招贤', '举正直', '恤孤茕', '宣政事', '雪冤', '庆赐', '宴会', '出行',
               '安抚边境', '选将', '上官', '临政', '结婚姻', '纳采', '嫁娶', '进人口', '搬移', '裁制', '营建', '缮城郭', '修造', '竖柱上梁', '修仓库', '经络',
               '酝酿', '开市', '立券交易', '纳财', '栽种', '牧养', '纳畜', '安葬'], []),  # 天愿日，以月之干支为依据，择与之和合之日为是，故为月之喜神

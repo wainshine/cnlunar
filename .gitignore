@@ -1,6 +1,10 @@
 *.xml
 *.pyc
 /dist
+/build
 /cnlunar.egg-info
 /.idea/
 *.DS_Store
+/setup.py
+/*.toml
+/pyproject.toml
